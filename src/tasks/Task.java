@@ -1,3 +1,5 @@
+package tasks;
+
 import java.util.Objects;
 
 public class Task {
@@ -56,7 +58,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task[id=" + id + ", title=" + title + ", status=" + status + "]";
+        return "tasks.Task[id=" + id + ", title=" + title + ", status=" + status + "]";
     }
 
 }

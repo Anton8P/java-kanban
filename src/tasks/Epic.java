@@ -1,27 +1,30 @@
+package tasks;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Epic extends Task {
 
-    private final ArrayList<Subtask> subtasks = new ArrayList<>();
+    private final ArrayList<Integer> subtasksId = new ArrayList<>();
 
     public Epic(String title, String description) {
         super(title, description);
     }
 
-    public void addSubtask(Subtask subtask) {
-        subtasks.add(subtask);
+    public void addSubtaskId(int subtask) {
+        subtasksId.add(subtask);
     }
 
-    public ArrayList<Subtask> getSubtasks() {
-        return new ArrayList<>(subtasks);
+    public ArrayList<Integer> getSubtasksId() {
+        return new ArrayList<>(subtasksId);
     }
 
-    public void removeSubtask(Subtask subtask) {
-        subtasks.remove(subtask);
+    public boolean removeSubtaskId(int subtaskId) {
+        return subtasksId.remove(Integer.valueOf(subtaskId));
     }
 
-    public void updateStatus() {
-        if (subtasks.isEmpty()) {
+    public void updateEpicStatus(HashMap<Integer, Subtask> subtasksAll) {
+        if (subtasksId.isEmpty()) {
             setStatus(TaskStatus.NEW);
             return;
         }
@@ -29,7 +32,12 @@ public class Epic extends Task {
         boolean allTasksNew = true;
         boolean allTasksDone = true;
 
-        for (Subtask subtask : subtasks) {
+        for (Integer subtaskId : subtasksId) {
+            Subtask subtask = subtasksAll.get(subtaskId);
+            if (subtask == null) {
+                continue;
+            }
+
             if (subtask.getStatus() != TaskStatus.NEW) {
                 allTasksNew = false;
             }
