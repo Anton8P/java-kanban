@@ -1,21 +1,22 @@
 package tasks;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 public class Epic extends Task {
 
-    private final ArrayList<Integer> subtasksId = new ArrayList<>();
+    private final List<Integer> subtasksId;
 
-    public Epic(String title, String description) {
-        super(title, description);
+    public Epic(String title, String description, int id) {
+        super(title, description, id);
+        subtasksId = new ArrayList<>();
     }
 
-    public void addSubtaskId(int subtask) {
-        subtasksId.add(subtask);
+    public boolean addSubtaskId(Subtask subtask) {
+        return subtasksId.add(subtask.getId());
     }
 
-    public ArrayList<Integer> getSubtasksId() {
+    public List<Integer> getSubtasksId() {
         return new ArrayList<>(subtasksId);
     }
 

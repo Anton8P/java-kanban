@@ -8,13 +8,10 @@ public class Task {
     private String description;
     private TaskStatus status;
 
-    public Task(String title, String description) {
+    public Task(String title, String description, int id) {
         this.title = title;
         this.description = description;
         this.status = TaskStatus.NEW;
-    }
-
-    public void setId(int id) {
         this.id = id;
     }
 
@@ -26,16 +23,24 @@ public class Task {
         return title;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public TaskStatus getStatus() {
         return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public void setStatus(TaskStatus status) {
-        this.status = status;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -43,22 +48,21 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id &&
-                Objects.equals(title, task.title) &&
-                Objects.equals(description, task.description);
+        return id == task.id;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + Objects.hashCode(title);
-        result = 31 * result + Objects.hashCode(description);
-        return result;
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
-        return "tasks.Task[id=" + id + ", title=" + title + ", status=" + status + "]";
+        return "Task{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
-
 }
