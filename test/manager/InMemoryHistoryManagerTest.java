@@ -13,7 +13,8 @@ class InMemoryHistoryManagerTest {
     @Test
     void shouldPreservePreviousStateOfObject() {
         HistoryManager historyManager = Managers.getDefaultHistory();
-        Task initialTask = new Task("Initial Task", "Preview description", 155);
+        Task initialTask = new Task("Initial Task", "Preview description");
+        initialTask.setId(155);
         initialTask.setStatus(TaskStatus.IN_PROGRESS);
         historyManager.add(initialTask);
         initialTask.setTitle("Changed title");

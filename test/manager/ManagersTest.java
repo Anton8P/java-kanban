@@ -12,7 +12,7 @@ class ManagersTest {
     @Test
     void getDefaultReturnIsNotNull() {
         TaskManager taskManager = Managers.getDefault();
-        Epic epic = new Epic("Test Epic", "Description", taskManager.getGeneratedId());
+        Epic epic = new Epic("Test Epic", "Description");
         int idTask = taskManager.createEpic(epic);
         assertNotNull(taskManager, "Возвращаемый объект Менеджера не может быть Null");
         assertNotNull(epic, "Объект не может быть Null");
@@ -22,7 +22,7 @@ class ManagersTest {
     @Test
     void getDefaultHistory() {
         HistoryManager historyManager = Managers.getDefaultHistory();
-        Task task = new Task("Test Task", "Description", 555);
+        Task task = new Task("Test Task", "Description");
         historyManager.add(task);
         Task taskFromHistory = historyManager.getHistory().getFirst();
         assertNotNull(taskFromHistory, "Полученный из Истории объект не может быть Null");

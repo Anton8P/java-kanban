@@ -23,23 +23,27 @@ class TaskTest {
 
     @Test
     void comparisonShouldReturnTrueWhenComparingId() {
-        Task firstTask = new Task("Task original", "Description original", 150);
-        Task secondTask = new Task("Duplicate Task", "Duplicate description", 150);
+        Task firstTask = new Task("Task original", "Description original");
+        firstTask.setId(15);
+        Task secondTask = new Task("Duplicate Task", "Duplicate description");
+        secondTask.setId(15);
         assertEquals(firstTask, secondTask, "Задачи с одинаковым id должны быть равны, независимо от других полей");
         assertEquals(firstTask.hashCode(), secondTask.hashCode(), "Равные объекты должны иметь равные хэш-коды");
     }
 
     @Test
     void comparisonShouldReturnFalseWhenComparingId() {
-        Task firstTask = new Task("Task original", "Description original", 150);
-        Task secondTask = new Task("Task original", "Description original", 255);
+        Task firstTask = new Task("Task original", "Description original");
+        firstTask.setId(15);
+        Task secondTask = new Task("Task original", "Description original");
+        secondTask.setId(10);
         assertNotEquals(firstTask, secondTask, "Задачи с разными id не должны быть равны");
         assertNotEquals(firstTask.hashCode(), secondTask.hashCode(), "Задачи с разными id должны иметь разные хэш-коды");
     }
 
     @Test
     void addNewTask() {
-        Task task = new Task("Test addNewTask", "Test addNewTask description", taskManager.getGeneratedId());
+        Task task = new Task("Test addNewTask", "Test addNewTask description");
         task.setStatus(NEW);
         final int taskId = taskManager.createTask(task);
         final Task savedTask = taskManager.getTask(taskId);
@@ -53,7 +57,7 @@ class TaskTest {
 
     @Test
     void add() {
-        Task task = new Task("Test addNewTask", "Test addNewTask description", taskManager.getGeneratedId());
+        Task task = new Task("Test addNewTask", "Test addNewTask description");
         historyManager.add(task);
         final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "После добавления задачи, история не должна быть пустой.");

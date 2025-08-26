@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface TaskManager {
 
-    int getGeneratedId();
-
     int createTask(Task task);
 
     int createEpic(Epic epic);
@@ -22,8 +20,6 @@ public interface TaskManager {
     boolean updateEpic(Epic newEpic);
 
     boolean updateSubtask(Subtask newSubtask);
-
-    void updateEpicStatus(int epicId);
 
     Task getTask(int id);
 

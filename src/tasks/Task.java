@@ -8,10 +8,17 @@ public class Task {
     private String description;
     private TaskStatus status;
 
-    public Task(String title, String description, int id) {
+    public Task(String title, String description) {
         this.title = title;
         this.description = description;
         this.status = TaskStatus.NEW;
+    }
+
+    public void setId(int id) {
+        if (id <= 0) {
+            System.out.println("id должен быть положительным");
+            return;
+        }
         this.id = id;
     }
 
