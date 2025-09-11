@@ -1,8 +1,6 @@
 import manager.HistoryManager;
 import manager.Managers;
 import manager.TaskManager;
-import tasks.Epic;
-import tasks.Subtask;
 import tasks.Task;
 
 import java.util.List;
@@ -37,58 +35,6 @@ public class Main {
         historyManager.remove(taskManager.getTaskById(id1).getId());
         List<Task> deletedHistory = historyManager.getHistory();
         System.out.println(deletedHistory);
-
-
-//        Task task1 = new Task("Задача 1", "Первая задача");
-//        int idTask1 = taskManager.createTask(task1);
-//        Task task2 = new Task("Задача 2", "Вторая задача");
-//        int idTask2 = taskManager.createTask(task2);
-//        Epic epic = new Epic("Эпик", "Эпик с тремя подзадачами");
-//        int idEpic = taskManager.createEpic(epic);
-//        Subtask subtask1 = new Subtask("Подзадача 1", "Подзадача 1 к Эпику", idEpic);
-//        int idSub1 = taskManager.createSubtask(subtask1);
-//        Subtask subtask2 = new Subtask("Подзадача 2", "Подзадача 2 к Эпику", idEpic);
-//        int idSub2 = taskManager.createSubtask(subtask2);
-//        Subtask subtask3 = new Subtask("Подзадача 3", "Подзадача 3 к Эпику", idEpic);
-//        int idSub3 = taskManager.createSubtask(subtask3);
-//        Epic epicWithoutSubtasks = new Epic("Эпик без подзадач", "Эпик и ноль подзадач");
-//        int epicWithoutSubtasksId = taskManager.createEpic(epicWithoutSubtasks);
-//
-//        taskManager.getTask(idTask1);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getTask(idTask2);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getEpic(idEpic);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getTask(idTask1);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getTask(idTask1);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getSubtask(idSub1);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getEpic(epicWithoutSubtasksId);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getSubtask(idSub2);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getSubtask(idSub3);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getEpic(epicWithoutSubtasksId);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.getSubtask(idSub3);
-//        System.out.println(taskManager.getHistory());
-//        System.out.println("-".repeat(5));
-//        taskManager.deleteEpicById(idEpic);
-//        System.out.println(taskManager.getHistory());
 
     }
 }
