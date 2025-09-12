@@ -14,25 +14,12 @@ public class InMemoryHistoryManager implements HistoryManager {
     private int sizeTaskList;
     private int size;
 
-
     public InMemoryHistoryManager() {
         this.historyTask = new HashMap<>();
         this.taskList = new ArrayList<>();
         this.head = null;
         this.tail = null;
         this.size = 0;
-    }
-
-    private static class Node<T> {
-        public Task task;
-        public Node<Task> next;
-        public Node<Task> prev;
-
-        public Node(Task task) {
-            this.task = task;
-            this.next = null;
-            this.prev = null;
-        }
     }
 
     @Override
@@ -54,7 +41,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         return listHistory;
     }
-
 
     @Override
     public void add(Task task) {
@@ -79,10 +65,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         taskList.add(node.task);
         sizeTaskList++;
         size++;
-    }
-
-    public List<Task> getTasks() {
-        return taskList;
     }
 
     private boolean removeNode(Node<Task> nodeToDelete) {
@@ -114,5 +96,17 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public int getSizeTaskList() {
         return sizeTaskList;
+    }
+
+    private static class Node<T> {
+        public Task task;
+        public Node<Task> next;
+        public Node<Task> prev;
+
+        public Node(Task task) {
+            this.task = task;
+            this.next = null;
+            this.prev = null;
+        }
     }
 }

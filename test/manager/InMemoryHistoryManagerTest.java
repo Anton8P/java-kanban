@@ -2,9 +2,12 @@ package manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tasks.Epic;
+import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -114,5 +117,27 @@ class InMemoryHistoryManagerTest {
 
         List<Task> finalHistory = historyManager.getHistory();
         assertTrue(finalHistory.isEmpty(), "История должна остаться пустой после удаления несуществующей задачи");
+    }
+
+    @Test
+    void methodAddShouldAcceptAllTaskTypes() {
+        Task task = new Task(1, "Task", "Description to task", TaskStatus.NEW);
+        Epic epic = new Epic(2, "Epic", "Description to epic", TaskStatus.NEW, new ArrayList<>());
+        Subtask subtask = new Subtask(3, "Subtask", "Description to subtask", TaskStatus.NEW, 2);
+
+        historyManager.add(task);
+        historyManager.add(epic);
+        historyManager.add(subtask);
+
+        List<Task> history = historyManager.getHistory();
+        assertEquals(3, history.size(), "Должно быть 3 задачи в истории");
+
+        assertInstanceOf(Task.class, history.get(0), "Первая задача должна быть Task");
+        assertInstanceOf(Epic.class, history.get(1), "Вторая задача должна быть Epic");
+        assertInstanceOf(Subtask.class, history.get(2), "Третья задача должна быть Subtask");
+
+        assertEquals(1, history.get(0).getId(), "У первой задачи должен быть ID = 1");
+        assertEquals(2, history.get(1).getId(), "У первой задачи должен быть ID = 2");
+        assertEquals(3, history.get(2).getId(), "У первой задачи должен быть ID = 3");
     }
 }

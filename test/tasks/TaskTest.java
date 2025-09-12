@@ -82,5 +82,4 @@ class TaskTest {
         assertNotSame(task, withNewStatus);
         assertNotSame(task, withNewId);
     }
-
 }
