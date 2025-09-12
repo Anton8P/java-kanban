@@ -3,23 +3,20 @@ package tasks;
 import java.util.Objects;
 
 public class Task {
-    private int id;
-    private String title;
-    private String description;
-    private TaskStatus status;
+    private final int id;
+    private final String title;
+    private final String description;
+    private final TaskStatus status;
 
-    public Task(String title, String description) {
+    public Task(int id, String title, String description, TaskStatus status) {
+        this.id = id;
         this.title = title;
         this.description = description;
-        this.status = TaskStatus.NEW;
+        this.status = status;
     }
 
-    public void setId(int id) {
-        if (id <= 0) {
-            System.out.println("id должен быть положительным");
-            return;
-        }
-        this.id = id;
+    public Task(String title, String description) {
+        this(0, title, description, TaskStatus.NEW);
     }
 
     public int getId() {
@@ -38,17 +35,22 @@ public class Task {
         return status;
     }
 
-    public void setStatus(TaskStatus status) {
-        this.status = status;
+    public Task withId(int newId) {
+        return new Task(newId, this.title, this.description, this.status);
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public Task withTitle(String newTitle) {
+        return new Task(this.id, newTitle, this.description, this.status);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public Task withDescription(String newDescription) {
+        return new Task(this.id, this.title, newDescription, this.status);
     }
+
+    public Task withStatus(TaskStatus newStatus) {
+        return new Task(this.id, this.title, this.description, newStatus);
+    }
+
 
     @Override
     public boolean equals(Object o) {
