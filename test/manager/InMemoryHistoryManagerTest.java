@@ -2,10 +2,7 @@ package manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tasks.Epic;
-import tasks.Subtask;
-import tasks.Task;
-import tasks.TaskStatus;
+import tasks.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +21,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void shouldPreservePreviousStateOfObject() {
-        Task initialTask = new Task(155, "Initial Task", "Preview description"
+        Task initialTask = new Task(155, TaskType.TASK, "Initial Task", "Preview description"
                 , TaskStatus.IN_PROGRESS);
         historyManager.add(initialTask);
         Task modifiedTask = initialTask
@@ -121,9 +118,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void methodAddShouldAcceptAllTaskTypes() {
-        Task task = new Task(1, "Task", "Description to task", TaskStatus.NEW);
-        Epic epic = new Epic(2, "Epic", "Description to epic", TaskStatus.NEW, new ArrayList<>());
-        Subtask subtask = new Subtask(3, "Subtask", "Description to subtask", TaskStatus.NEW, 2);
+        Task task = new Task(1, TaskType.TASK, "Task", "Description to task", TaskStatus.NEW);
+        Epic epic = new Epic(2, TaskType.EPIC, "Epic", "Description to epic", TaskStatus.NEW, new ArrayList<>());
+        Subtask subtask = new Subtask(3, TaskType.SUBTASK, "Subtask", "Description to subtask", TaskStatus.NEW, 2);
 
         historyManager.add(task);
         historyManager.add(epic);

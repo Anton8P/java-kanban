@@ -67,7 +67,7 @@ class SubtaskTest {
 
     @Test
     void subtaskFieldsShouldNotBeMutable() {
-        Subtask subtask = new Subtask(1, "Subtask Title", "Subtask Description", TaskStatus.NEW, 150);
+        Subtask subtask = new Subtask(1, TaskType.SUBTASK, "Subtask Title", "Subtask Description", TaskStatus.NEW, 150);
         Subtask withNewEpicId = subtask.withEpicId(200);
         Subtask withNewTitle = subtask.withTitle("New Title");
         assertEquals(150, subtask.getEpicId());

@@ -86,7 +86,7 @@ class EpicTest {
     @Test
     void getSubtasksIdShouldReturnCopy() {
         List<Integer> initialSubtasks = Arrays.asList(1, 2, 3);
-        Epic epic = new Epic(1, "Test", "Description", TaskStatus.NEW, initialSubtasks);
+        Epic epic = new Epic(1, TaskType.EPIC, "Test", "Description", TaskStatus.NEW, initialSubtasks);
         List<Integer> subtasks = epic.getSubtasksId();
         assertNotSame(initialSubtasks, subtasks, "Должна вернуться копия");
         assertEquals(initialSubtasks, subtasks, "Содержимое должно совпадать");
@@ -100,7 +100,7 @@ class EpicTest {
     @Test
     void shouldRemoveSubtaskById() {
         List<Integer> initialSubtasks = new ArrayList<>(Arrays.asList(101, 102, 103));
-        Epic epic = new Epic(1, "Test Epic", "Description", TaskStatus.NEW, initialSubtasks);
+        Epic epic = new Epic(1, TaskType.EPIC, "Test Epic", "Description", TaskStatus.NEW, initialSubtasks);
         boolean result = epic.removeSubtaskId(102);
         assertTrue(result, "Метод должен вернуть true при успешном удалении");
         List<Integer> othersSubtasks = epic.getSubtasksId();
@@ -113,7 +113,7 @@ class EpicTest {
     @Test
     void epicFieldsShouldNotBeMutable() {
         List<Integer> subtasks = List.of(101, 102);
-        Epic epic = new Epic(1, "Epic Title", "Epic Description", TaskStatus.NEW, subtasks);
+        Epic epic = new Epic(1, TaskType.EPIC, "Epic Title", "Epic Description", TaskStatus.NEW, subtasks);
         Epic withNewSubtasks = epic.withSubtasks(List.of(201, 202));
         Epic withAddedSubtask = epic.addSubtaskId(103);
         assertEquals(List.of(101, 102), epic.getSubtasksId());
