@@ -7,17 +7,56 @@ import java.nio.file.Files;
 import java.util.List;
 
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final File autoSaveFile;
 
     public FileBackedTaskManager(File file) {
-        this.autoSaveFile = file;
-        load();
+        autoSaveFile = file;
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
-        return new FileBackedTaskManager(file);
+
+        FileBackedTaskManager manager = new FileBackedTaskManager(file);
+
+        if (!file.exists()) {
+            throw new ManagerSaveException("По данному пути файл/каталог не найден");
+        }
+        String content = null;
+        try {
+            content = Files.readString(file.toPath());
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка загрузки из файла: " + file, e);
+        }
+
+        String[] lines = content.split("\n");
+
+        manager.getTasksMap().clear();
+        manager.getEpicsMap().clear();
+        manager.getSubtasksMap().clear();
+
+        boolean allFieldsTitle = true;
+
+        for (String line : lines) {
+            if (allFieldsTitle) {
+                allFieldsTitle = false;
+                continue;
+            }
+
+            Task task = fromString(line);
+
+            if (task != null) {
+
+                if (task instanceof Epic) {
+                    manager.addEpicDirectlyToMap((Epic) task);
+                } else if (task instanceof Subtask) {
+                    manager.addSubtaskDirectlyToMap((Subtask) task);
+                } else {
+                    manager.addTaskDirectlyToMap(task);
+                }
+            }
+        }
+        return manager;
     }
 
     public void save() {
@@ -166,47 +205,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return isDelete;
     }
 
-    private void load() {
-        if (!autoSaveFile.exists()) {
-            return;
-        }
-        String content = null;
-        try {
-            content = Files.readString(autoSaveFile.toPath());
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка загрузки из файла: " + autoSaveFile, e);
-        }
-
-        String[] lines = content.split("\n");
-
-        boolean allFieldsTitle = true;
-        int countTasks = 0;
-
-        for (String line : lines) {
-            if (allFieldsTitle) {
-                allFieldsTitle = false;
-                continue;
-            }
-
-            Task task = fromString(line);
-
-            if (task != null) {
-
-                if (task instanceof Epic) {
-                    createEpic((Epic) task);
-                } else if (task instanceof Subtask) {
-                    createSubtask((Subtask) task);
-                } else {
-                    createTask(task);
-                }
-                countTasks++;
-            }
-        }
-
-        System.out.println("Загружено задач: " + countTasks);
-    }
-
-    private Task fromString(String value) {
+    private static Task fromString(String value) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }
@@ -318,6 +317,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка: " + e.getMessage());
         }
+
+
     }
 
 }

@@ -205,13 +205,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public ArrayList<Subtask> getAllSubtasksFromEpic(int epicId) {
         ArrayList<Subtask> allSubtasks = new ArrayList<>();
-        Epic epic = epics.get(epicId);
-        if (epic != null) {
-            for (int subtaskId : epic.getSubtasksId()) {
-                Subtask subtask = subtasks.get(subtaskId);
-                if (subtask != null) {
-                    allSubtasks.add(subtask);
-                }
+        for (Subtask subtask : subtasks.values()) {
+            if (subtask.getEpicId() == epicId) {
+                allSubtasks.add(subtask);
             }
         }
         return allSubtasks;
@@ -293,6 +289,36 @@ public class InMemoryTaskManager implements TaskManager {
         boolean isDelete = subtasks.remove(id) != null;
         updateEpicStatus(subtask.getEpicId());
         return isDelete;
+    }
+
+    protected Map<Integer, Task> getTasksMap() {
+        return tasks;
+    }
+
+    protected Map<Integer, Epic> getEpicsMap() {
+        return epics;
+    }
+
+    protected Map<Integer, Subtask> getSubtasksMap() {
+        return subtasks;
+    }
+
+    protected void addTaskDirectlyToMap(Task task) {
+        if (task != null && task.getId() != 0) {
+            tasks.put(task.getId(), task);
+        }
+    }
+
+    protected void addEpicDirectlyToMap(Epic epic) {
+        if (epic != null && epic.getId() != 0) {
+            epics.put(epic.getId(), epic);
+        }
+    }
+
+    protected void addSubtaskDirectlyToMap(Subtask subtask) {
+        if (subtask != null && subtask.getId() != 0) {
+            subtasks.put(subtask.getId(), subtask);
+        }
     }
 
     private void updateEpicStatus(int epicId) {

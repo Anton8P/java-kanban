@@ -12,7 +12,62 @@ import java.nio.file.Files;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskManager> {
+
+    private File tempFile;
+
+    @Override
+    protected FileBackedTaskManager createTaskManager() {
+        try {
+            tempFile = File.createTempFile("test_manager_file", ".txt");
+            tempFile.deleteOnExit();
+            return new FileBackedTaskManager(tempFile);
+        } catch (IOException e) {
+            throw new ManagerSaveException("Не удалось создать файл");
+        }
+    }
+
+    @Test
+    @Override
+    void createTaskTest() {
+        super.createTaskTest();
+    }
+
+    @Test
+    @Override
+    void createEpicTest() {
+        super.createEpicTest();
+    }
+
+    @Test
+    @Override
+    void createSubtaskTest() {
+        super.createSubtaskTest();
+    }
+
+    @Test
+    @Override
+    void getAllTasksTest() {
+        super.getAllTasksTest();
+    }
+
+    @Test
+    @Override
+    void updateTaskTest() {
+        super.updateTaskTest();
+    }
+
+    @Test
+    @Override
+    void deleteTaskTest() {
+        super.deleteTaskTest();
+    }
+
+    @Test
+    @Override
+    void getAllSubtasksFromEpicTest() {
+        super.getAllSubtasksFromEpicTest();
+    }
 
     @Test
     void shouldSaveAndLoadEmptyFile() throws IOException {
