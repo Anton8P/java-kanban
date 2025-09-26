@@ -70,6 +70,24 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
     }
 
     @Test
+    void shouldReturnAllSubtasksFromEpicAfterLoaded() throws IOException {
+        File testFile = File.createTempFile("test_temp",".txt");
+        testFile.deleteOnExit();
+        taskManager = new FileBackedTaskManager(testFile);
+
+        Epic epic = new Epic("Эпик1", "Описание эпика1");
+        int epicId1 = taskManager.createEpic(epic);
+        Subtask subtask1 = new Subtask("Подзадача1", "Описание подзадачи1", epicId1);
+        Subtask subtask2 = new Subtask("Подзадача2", "Описание подзадачи2", epicId1);
+        int subtaskId1 = taskManager.createSubtask(subtask1);
+        int subtaskId2 = taskManager.createSubtask(subtask2);
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(testFile);
+        assertFalse(loadedManager.getEpicById(epicId1).getSubtasksId().isEmpty());
+        assertEquals(2, loadedManager.getEpicById(epicId1).getSubtasksId().size());
+    }
+
+    @Test
     void shouldSaveAndLoadEmptyFile() throws IOException {
         File testFile = File.createTempFile("test_temp", ".txt");
         testFile.deleteOnExit();

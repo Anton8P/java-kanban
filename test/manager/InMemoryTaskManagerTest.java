@@ -6,6 +6,8 @@ import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManager> {
@@ -55,6 +57,17 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
     @Override
     void getAllSubtasksFromEpicTest() {
         super.getAllSubtasksFromEpicTest();
+    }
+
+    @Test
+    void shouldRestoreMaximumId() {
+        File file = new File("test.txt");
+        FileBackedTaskManager manager = new FileBackedTaskManager(file);
+        int maxId = 10;
+        if (maxId >= manager.generatedId) {
+            manager.generatedId = maxId + 1;
+        }
+        assertEquals(11, manager.generatedId);
     }
 
     @Test

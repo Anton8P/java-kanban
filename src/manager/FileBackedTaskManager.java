@@ -4,6 +4,7 @@ import tasks.*;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,11 +32,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         String[] lines = content.split("\n");
 
-        manager.getTasksMap().clear();
-        manager.getEpicsMap().clear();
-        manager.getSubtasksMap().clear();
-
         boolean allFieldsTitle = true;
+        int maxId = 0;
 
         for (String line : lines) {
             if (allFieldsTitle) {
@@ -46,15 +44,32 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             Task task = fromString(line);
 
             if (task != null) {
-
+                maxId = Math.max(maxId, task.getId());
                 if (task instanceof Epic) {
-                    manager.addEpicDirectlyToMap((Epic) task);
+                    manager.epics.put(task.getId(), (Epic) task);
                 } else if (task instanceof Subtask) {
-                    manager.addSubtaskDirectlyToMap((Subtask) task);
+                    manager.subtasks.put(task.getId(), (Subtask) task);
                 } else {
-                    manager.addTaskDirectlyToMap(task);
+                    manager.tasks.put(task.getId(), task);
                 }
             }
+        }
+
+        for (Epic epic : manager.epics.values()) {
+            List<Integer> subtaskList = new ArrayList<>();
+
+            epic.getSubtasksId();
+
+            for (Subtask subtask : manager.subtasks.values()) {
+                if (subtask.getEpicId() == epic.getId()) {
+                    subtaskList.add(subtask.getId());
+                }
+            }
+            manager.epics.put(epic.getId(), epic.withSubtasks(subtaskList));
+        }
+
+        if (maxId >= manager.generatedId) {
+            manager.generatedId = maxId + 1;
         }
         return manager;
     }
@@ -317,8 +332,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка: " + e.getMessage());
         }
-
-
     }
-
 }
