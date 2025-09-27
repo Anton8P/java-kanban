@@ -68,7 +68,7 @@ class TaskTest {
 
     @Test
     void taskFieldsShouldNotBeMutable() {
-        Task task = new Task(1, "Original Title", "Original Description", TaskStatus.NEW);
+        Task task = new Task(1, TaskType.TASK, "Original Title", "Original Description", TaskStatus.NEW);
         Task withNewTitle = task.withTitle("New Title");
         Task withNewDesc = task.withDescription("New Description");
         Task withNewStatus = task.withStatus(TaskStatus.DONE);

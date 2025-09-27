@@ -1,48 +1,73 @@
 package manager;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryTaskManagerTest {
-    InMemoryTaskManager inMemoryTaskManager;
-    TaskManager taskManager;
+class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManager> {
 
-    @BeforeEach
-    void setUp() {
-        taskManager = Managers.getDefault();
-        inMemoryTaskManager = new InMemoryTaskManager();
+    @Override
+    protected InMemoryTaskManager createTaskManager() {
+        return new InMemoryTaskManager();
     }
 
     @Test
-    void createTask() {
-        Task task = new Task("Test NewTask", "Test NewTask description");
-        int taskId = inMemoryTaskManager.createTask(task);
-        Task twoTask = inMemoryTaskManager.getTask(taskId);
-        Task threeTask = inMemoryTaskManager.getTaskById(taskId);
-        assertNotNull(task, "Созданная Задача не может быть Null");
-        assertNotNull(twoTask, "Вернувшаяся по id Задача не может быть Null");
-        assertNotNull(threeTask, "Вернувшаяся по id Задача не может быть Null");
-        assertNotNull(inMemoryTaskManager.getTask(taskId), "Задача должна быть в хранилище с правильным типом данных");
-        assertNull(inMemoryTaskManager.getEpic(taskId), "Задача не должна находиться в хранилище не с тем типом данных");
+    @Override
+    void createTaskTest() {
+        super.createTaskTest();
     }
 
     @Test
-    void createEpic() {
-        Epic epic = new Epic("Test NewEpic", "Test NewEpic description");
-        int epicId = inMemoryTaskManager.createEpic(epic);
-        Task twoEpic = inMemoryTaskManager.getEpic(epicId);
-        Task threeEpic = inMemoryTaskManager.getEpicById(epicId);
-        assertNotNull(epic, "Созданный Epic не может быть Null");
-        assertNotNull(twoEpic, "Вернувшийся по id Epic не может быть Null");
-        assertNotNull(threeEpic, "Вернувшийся по id Epic не может быть Null");
-        assertNotNull(inMemoryTaskManager.getEpic(epicId), "Epic должн быть в хранилище с правильным типом данных");
-        assertNull(inMemoryTaskManager.getSubtask(epicId), "Epic не должен находиться в хранилище не с тем типом данных");
+    @Override
+    void createEpicTest() {
+        super.createEpicTest();
+    }
+
+    @Test
+    @Override
+    void createSubtaskTest() {
+        super.createSubtaskTest();
+    }
+
+    @Test
+    @Override
+    void getAllTasksTest() {
+        super.getAllTasksTest();
+    }
+
+    @Test
+    @Override
+    void updateTaskTest() {
+        super.updateTaskTest();
+    }
+
+    @Test
+    @Override
+    void deleteTaskTest() {
+        super.deleteTaskTest();
+    }
+
+    @Test
+    @Override
+    void getAllSubtasksFromEpicTest() {
+        super.getAllSubtasksFromEpicTest();
+    }
+
+    @Test
+    void shouldRestoreMaximumId() {
+        File file = new File("test.txt");
+        FileBackedTaskManager manager = new FileBackedTaskManager(file);
+        int maxId = 10;
+        if (maxId >= manager.generatedId) {
+            manager.generatedId = maxId + 1;
+        }
+        assertEquals(11, manager.generatedId);
     }
 
     @Test

@@ -4,19 +4,21 @@ import java.util.Objects;
 
 public class Task {
     private final int id;
+    private final TaskType type;
     private final String title;
     private final String description;
     private final TaskStatus status;
 
-    public Task(int id, String title, String description, TaskStatus status) {
+    public Task(int id, TaskType type, String title, String description, TaskStatus status) {
         this.id = id;
+        this.type = type;
         this.title = title;
         this.description = description;
         this.status = status;
     }
 
     public Task(String title, String description) {
-        this(0, title, description, TaskStatus.NEW);
+        this(0, TaskType.TASK, title, description, TaskStatus.NEW);
     }
 
     public int getId() {
@@ -35,20 +37,24 @@ public class Task {
         return status;
     }
 
+    public TaskType getType() {
+        return type;
+    }
+
     public Task withId(int newId) {
-        return new Task(newId, this.title, this.description, this.status);
+        return new Task(newId, this.type, this.title, this.description, this.status);
     }
 
     public Task withTitle(String newTitle) {
-        return new Task(this.id, newTitle, this.description, this.status);
+        return new Task(this.id, this.type, newTitle, this.description, this.status);
     }
 
     public Task withDescription(String newDescription) {
-        return new Task(this.id, this.title, newDescription, this.status);
+        return new Task(this.id, this.type, this.title, newDescription, this.status);
     }
 
     public Task withStatus(TaskStatus newStatus) {
-        return new Task(this.id, this.title, this.description, newStatus);
+        return new Task(this.id, this.type, this.title, this.description, newStatus);
     }
 
 
