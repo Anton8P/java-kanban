@@ -56,8 +56,8 @@ class EpicTest {
         Subtask wrongSubtask = new Subtask("Wrong Subtask", "Fail test", epic.getId()).withId(epic.getId());
         int result = taskManager.createSubtask(wrongSubtask);
         assertEquals(0, result, "Epic не должен быть subtask");
-        assertNull(taskManager.getSubtask(epic.getId()), "Subtask не должна создаваться");
-        assertEquals(0, epic.getSubtasksId().size(), "У Epic не должно быть subtasks");
+        assertNull(taskManager.getSubtaskById(epic.getId()), "Subtask не должна создаваться");
+        assertEquals(0, epic.getSubtasksAllIds().size(), "У Epic не должно быть subtasks");
     }
 
     @Test
@@ -69,13 +69,13 @@ class EpicTest {
         int subtaskId1 = taskManager.createSubtask(subtask1);
         int subtaskId2 = taskManager.createSubtask(subtask2);
         Epic epicWithSubtasks = taskManager.getEpicById(epicId);
-        List<Integer> subtaskIds = epicWithSubtasks.getSubtasksId();
+        List<Integer> subtaskIds = epicWithSubtasks.getSubtasksAllIds();
         assertEquals(2, subtaskIds.size(), "Эпик должен содержать 2 подзадачи");
         assertTrue(subtaskIds.contains(subtaskId1), "Эпик должен содержать подзадачу 1");
         assertTrue(subtaskIds.contains(subtaskId2), "Эпик должен содержать подзадачу 2");
         taskManager.deleteSubtaskById(subtaskId1);
         Epic epicAfterDeletion = taskManager.getEpicById(epicId);
-        List<Integer> updatedSubtaskIds = epicAfterDeletion.getSubtasksId();
+        List<Integer> updatedSubtaskIds = epicAfterDeletion.getSubtasksAllIds();
         assertEquals(1, updatedSubtaskIds.size(), "Эпик должен содержать 1 подзадачу после удаления");
         assertFalse(updatedSubtaskIds.contains(subtaskId1), "Эпик НЕ должен содержать ID удаленной подзадачи");
         assertTrue(updatedSubtaskIds.contains(subtaskId2), "Эпик должен содержать ID оставшейся подзадачи");
@@ -84,26 +84,27 @@ class EpicTest {
     }
 
     @Test
-    void getSubtasksIdShouldReturnCopy() {
+    void originalListOfSubtasksShouldNotChange() {
         List<Integer> initialSubtasks = Arrays.asList(1, 2, 3);
-        Epic epic = new Epic(1, TaskType.EPIC, "Test", "Description", TaskStatus.NEW, initialSubtasks);
-        List<Integer> subtasks = epic.getSubtasksId();
+        Epic epic = new Epic("Test", "Description").withSubtasks(initialSubtasks);
+        List<Integer> subtasks = epic.getSubtasksAllIds();
         assertNotSame(initialSubtasks, subtasks, "Должна вернуться копия");
         assertEquals(initialSubtasks, subtasks, "Содержимое должно совпадать");
         subtasks.add(4);
-        subtasks.remove(0);
-        List<Integer> originalSubtasks = epic.getSubtasksId();
+        subtasks.add(5);
+        subtasks.remove(1);
+        List<Integer> originalSubtasks = epic.getSubtasksAllIds();
         assertEquals(3, originalSubtasks.size(), "Оригинальный список не должен измениться");
         assertEquals(Arrays.asList(1, 2, 3), originalSubtasks, "Оригинальное содержимое не должно измениться");
     }
 
     @Test
-    void shouldRemoveSubtaskById() {
+    void shouldRemoveSubtaskIdsFromEpic() {
         List<Integer> initialSubtasks = new ArrayList<>(Arrays.asList(101, 102, 103));
-        Epic epic = new Epic(1, TaskType.EPIC, "Test Epic", "Description", TaskStatus.NEW, initialSubtasks);
-        boolean result = epic.removeSubtaskId(102);
-        assertTrue(result, "Метод должен вернуть true при успешном удалении");
-        List<Integer> othersSubtasks = epic.getSubtasksId();
+        Epic epic = new Epic("Test Epic", "Description").withSubtasks(initialSubtasks).withId(1);
+        assertTrue(epic.removeSubtaskId(102), "Метод должен вернуть true при успешном удалении");
+        assertFalse(epic.removeSubtaskId(105), "Метод должен вернуть true при не успешном удалении");
+        List<Integer> othersSubtasks = epic.getSubtasksAllIds();
         assertEquals(2, othersSubtasks.size(), "Должно остаться 2 подзадачи");
         assertTrue(othersSubtasks.contains(101), "Должна остаться подзадача 101");
         assertTrue(othersSubtasks.contains(103), "Должна остаться подзадача 103");
@@ -113,10 +114,10 @@ class EpicTest {
     @Test
     void epicFieldsShouldNotBeMutable() {
         List<Integer> subtasks = List.of(101, 102);
-        Epic epic = new Epic(1, TaskType.EPIC, "Epic Title", "Epic Description", TaskStatus.NEW, subtasks);
+        Epic epic = new Epic("Epic Title", "Epic Description").withSubtasks(subtasks).withId(1);
         Epic withNewSubtasks = epic.withSubtasks(List.of(201, 202));
         Epic withAddedSubtask = epic.addSubtaskId(103);
-        assertEquals(List.of(101, 102), epic.getSubtasksId());
+        assertEquals(List.of(101, 102), epic.getSubtasksAllIds());
         assertEquals("Epic Title", epic.getTitle());
         assertEquals(1, epic.getId());
         assertNotSame(epic, withNewSubtasks);

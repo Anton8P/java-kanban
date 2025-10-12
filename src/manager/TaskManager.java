@@ -21,12 +21,6 @@ public interface TaskManager {
 
     boolean updateSubtask(Subtask newSubtask);
 
-    Task getTask(int id);
-
-    Epic getEpic(int id);
-
-    Subtask getSubtask(int id);
-
     ArrayList<Task> getAllTasks();
 
     ArrayList<Epic> getAllEpics();
@@ -39,7 +33,7 @@ public interface TaskManager {
 
     Subtask getSubtaskById(int id);
 
-    ArrayList<Subtask> getAllSubtasksFromEpic(int epicId);
+    List<Subtask> getAllSubtasksByEpicId(int epicId);
 
     List<Task> getHistory();
 

@@ -4,6 +4,8 @@ import tasks.*;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
-
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
 
         if (!file.exists()) {
@@ -42,15 +43,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
 
             Task task = fromString(line);
-
             if (task != null) {
                 maxId = Math.max(maxId, task.getId());
                 if (task instanceof Epic) {
                     manager.epics.put(task.getId(), (Epic) task);
                 } else if (task instanceof Subtask) {
                     manager.subtasks.put(task.getId(), (Subtask) task);
+                    if (task.getStartTime() != null) {
+                        manager.prioritizedTasks.add(task);
+                    }
                 } else {
                     manager.tasks.put(task.getId(), task);
+                    if (task.getStartTime() != null) {
+                        manager.prioritizedTasks.add(task);
+                    }
                 }
             }
         }
@@ -58,14 +64,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         for (Epic epic : manager.epics.values()) {
             List<Integer> subtaskList = new ArrayList<>();
 
-            epic.getSubtasksId();
-
             for (Subtask subtask : manager.subtasks.values()) {
                 if (subtask.getEpicId() == epic.getId()) {
                     subtaskList.add(subtask.getId());
                 }
             }
-            manager.epics.put(epic.getId(), epic.withSubtasks(subtaskList));
+
+            Epic epicWithSubtasks = epic.withSubtasks(subtaskList);
+            manager.epics.put(epic.getId(), epicWithSubtasks);
+
+            manager.calculateEpicTime(epic.getId());
+        }
+
+        for (Epic epic : manager.epics.values()) {
+            if (epic.getStartTime() != null) {
+                manager.prioritizedTasks.add(epic);
+            }
         }
 
         if (maxId >= manager.generatedId) {
@@ -77,7 +91,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void save() {
 
         StringBuilder data = new StringBuilder();
-        data.append("id,type,name,status,description,epic\n");
+        data.append("id,type,name,status,description,epic,startTime,duration\n");
 
         for (Task task : super.getAllTasks()) {
             data.append(taskToString(task)).append("\n");
@@ -103,59 +117,51 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         switch (task.getType()) {
             case EPIC:
                 Epic epic = (Epic) task;
-                return String.format("%d,%s,%s,%s,%s",
+                return String.format("%d,%s,%s,%s,%s,%s,%d",
                         epic.getId(), epic.getType(), epic.getTitle(),
-                        epic.getStatus(), epic.getDescription());
+                        epic.getStatus(), epic.getDescription(),
+                        epic.getStartTime(), epic.getDuration().toMinutes());
             case SUBTASK:
                 Subtask subtask = (Subtask) task;
-                return String.format("%d,%s,%s,%s,%s,%d",
+                return String.format("%d,%s,%s,%s,%s,%d,%s,%d",
                         subtask.getId(), subtask.getType(),
                         subtask.getTitle(), subtask.getStatus(),
-                        subtask.getDescription(), subtask.getEpicId());
+                        subtask.getDescription(), subtask.getEpicId(),
+                        subtask.getStartTime(),
+                        subtask.getDuration().toMinutes());
             case TASK:
             default:
-                return String.format("%d,%s,%s,%s,%s",
+                return String.format("%d,%s,%s,%s,%s,%s,%d",
                         task.getId(), task.getType(),
                         task.getTitle(), task.getStatus(),
-                        task.getDescription());
+                        task.getDescription(), task.getStartTime(),
+                        task.getDuration().toMinutes());
         }
     }
 
     @Override
-    public int createTask(Task taskDto) {
-        if (taskDto == null) {
-            throw new ManagerSaveException("Задача не может быть null");
-        }
-        int id = super.createTask(taskDto);
+    public int createTask(Task task) {
+        int id = super.createTask(task);
         save();
         return id;
     }
 
     @Override
-    public int createEpic(Epic epicDto) {
-        if (epicDto == null) {
-            throw new ManagerSaveException("Эпик не может быть null");
-        }
-        int id = super.createEpic(epicDto);
+    public int createEpic(Epic epic) {
+        int id = super.createEpic(epic);
         save();
         return id;
     }
 
     @Override
-    public int createSubtask(Subtask subtaskDto) {
-        if (subtaskDto == null) {
-            throw new ManagerSaveException("Подзадача не может быть null");
-        }
-        int id = super.createSubtask(subtaskDto);
+    public int createSubtask(Subtask subtask) {
+        int id = super.createSubtask(subtask);
         save();
         return id;
     }
 
     @Override
     public boolean updateTask(Task newTask) {
-        if (newTask == null) {
-            throw new ManagerSaveException("Задача не может быть null");
-        }
         boolean isUpdate = super.updateTask(newTask);
         save();
         return isUpdate;
@@ -163,9 +169,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public boolean updateEpic(Epic newEpic) {
-        if (newEpic == null) {
-            throw new ManagerSaveException("Эпик не может быть null");
-        }
         boolean isUpdate = super.updateEpic(newEpic);
         save();
         return isUpdate;
@@ -173,9 +176,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public boolean updateSubtask(Subtask newSubtask) {
-        if (newSubtask == null) {
-            throw new ManagerSaveException("Подзадача не может быть null");
-        }
         boolean isUpdate = super.updateSubtask(newSubtask);
         save();
         return isUpdate;
@@ -241,19 +241,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             switch (type) {
                 case EPIC:
-                    Epic epic = new Epic(title, description);
+                    LocalDateTime startTimeForEpic = LocalDateTime.parse(parts[5]);
+                    Duration durationForEpic = Duration.ofMinutes(Long.parseLong(parts[6]));
+                    Epic epic = new Epic(title, description, startTimeForEpic, durationForEpic.toMinutes());
                     epic = (Epic) epic.withId(id).withStatus(status);
                     return epic;
                 case SUBTASK:
-                    if (parts.length < 6) {
+                    if (parts.length < 7) {
                         throw new ManagerSaveException("Нехватает параметров для подзадачи");
                     }
                     int epicId = Integer.parseInt(parts[5].trim());
-                    Subtask subtask = new Subtask(title, description, epicId);
+                    LocalDateTime startTimeForSubtask = LocalDateTime.parse(parts[6]);
+                    Duration durationForSubtask = Duration.ofMinutes(Long.parseLong(parts[7]));
+                    Subtask subtask = new Subtask(title, description, epicId,
+                            startTimeForSubtask, durationForSubtask.toMinutes());
                     subtask = (Subtask) subtask.withId(id).withStatus(status);
                     return subtask;
                 case TASK:
-                    Task task = new Task(title, description);
+                    LocalDateTime startTimeForTask = LocalDateTime.parse(parts[5]);
+                    Duration durationForTask = Duration.ofMinutes(Long.parseLong(parts[6]));
+                    Task task = new Task(title, description, startTimeForTask, durationForTask.toMinutes());
                     task = task.withId(id).withStatus(status);
                     return task;
                 default:
@@ -319,12 +326,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             Epic epicFromManager2 = manager2.getEpicById(epicId1);
 
             boolean epic1Matches = epicFromManager1 != null && epicFromManager2 != null &&
-                    epicFromManager1.getTitle().equals(epicFromManager2.getTitle()) && epicFromManager1.getDescription().equals(epicFromManager2.getDescription());
+                    epicFromManager1.getTitle().equals(epicFromManager2.getTitle()) &&
+                    epicFromManager1.getDescription().equals(epicFromManager2.getDescription());
 
             System.out.println("Эпик из Менеджера1 совпадает с Эпиком из Менеджера2: " + epic1Matches);
 
-            List<Subtask> subtasksFromManager1 = manager1.getAllSubtasksFromEpic(epicId1);
-            List<Subtask> subtasksFromManager2 = manager2.getAllSubtasksFromEpic(epicId1);
+            List<Subtask> subtasksFromManager1 = manager1.getAllSubtasksByEpicId(epicId1);
+            List<Subtask> subtasksFromManager2 = manager2.getAllSubtasksByEpicId(epicId1);
 
             boolean subtasksLinksMatch = subtasksFromManager1.size() == subtasksFromManager2.size();
             System.out.println("Количество подзадач у эпиков Менеджера1 и Менеджера2 совпадают: " + subtasksLinksMatch);

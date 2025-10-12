@@ -25,19 +25,24 @@ class SubtaskTest {
     void comparisonShouldReturnTrueWhenComparingId() {
         Epic epic = new Epic("NewEpic", "NewEpic description");
         taskManager.createEpic(epic);
-        Subtask firstSubtask = new Subtask("Subtask original", "Description original", epic.getId()).withId(15);
-        Subtask secondSubtask = new Subtask("Duplicate Subtask", "Duplicate description", epic.getId()).withId(15);
+        Subtask firstSubtask = new Subtask("Subtask original", "Description original",
+                epic.getId()).withId(15);
+        Subtask secondSubtask = new Subtask("Duplicate Subtask", "Duplicate description",
+                epic.getId()).withId(15);
         assertEquals(firstSubtask, secondSubtask, "Subtask с одинаковым id должны быть равны, " +
                 "независимо от других полей");
-        assertEquals(firstSubtask.hashCode(), secondSubtask.hashCode(), "Равные объекты должны иметь равные хэш-коды");
+        assertEquals(firstSubtask.hashCode(), secondSubtask.hashCode(),
+                "Равные объекты должны иметь равные хэш-коды");
     }
 
     @Test
     void comparisonShouldReturnFalseWhenComparingId() {
         Epic epic = new Epic("NewEpic", "NewEpic description");
         taskManager.createEpic(epic);
-        Subtask firstSubtask = new Subtask("Subtask original", "Description original", epic.getId()).withId(15);
-        Subtask secondSubtask = new Subtask("Duplicate Subtask", "Duplicate description", epic.getId()).withId(10);
+        Subtask firstSubtask = new Subtask("Subtask original", "Description original",
+                epic.getId()).withId(15);
+        Subtask secondSubtask = new Subtask("Duplicate Subtask", "Duplicate description",
+                epic.getId()).withId(10);
         assertNotEquals(firstSubtask, secondSubtask, "Subtask с разными id не должны быть равны");
         assertNotEquals(firstSubtask.hashCode(), secondSubtask.hashCode(), "Subtask с разными id " +
                 "должны иметь разные хэш-коды");
@@ -62,15 +67,15 @@ class SubtaskTest {
         Subtask wrongSubtaskWrong = new Subtask("Wrong Subtask", "Fail test", subtaskId);
         int subtaskIdWrong = taskManager.createSubtask(wrongSubtaskWrong);
         assertEquals(0, subtaskIdWrong, "Subtask не должна быть Epic");
-        assertNull(taskManager.getSubtask(subtaskIdWrong), "Subtask не должна создаваться");
+        assertNull(taskManager.getSubtaskById(subtaskIdWrong), "Subtask не должна создаваться");
     }
 
     @Test
     void subtaskFieldsShouldNotBeMutable() {
-        Subtask subtask = new Subtask(1, TaskType.SUBTASK, "Subtask Title", "Subtask Description", TaskStatus.NEW, 150);
-        Subtask withNewEpicId = subtask.withEpicId(200);
+        Subtask subtask = new Subtask("Subtask Title", "Subtask Description", 5).withId(1);
+        Subtask withNewEpicId = subtask.withEpicId(7);
         Subtask withNewTitle = subtask.withTitle("New Title");
-        assertEquals(150, subtask.getEpicId());
+        assertEquals(5, subtask.getEpicId());
         assertEquals("Subtask Title", subtask.getTitle());
         assertEquals(1, subtask.getId());
         assertNotSame(subtask, withNewEpicId);
