@@ -76,12 +76,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             manager.calculateEpicTime(epic.getId());
         }
 
-        for (Epic epic : manager.epics.values()) {
-            if (epic.getStartTime() != null) {
-                manager.prioritizedTasks.add(epic);
-            }
-        }
-
         if (maxId >= manager.generatedId) {
             manager.generatedId = maxId + 1;
         }

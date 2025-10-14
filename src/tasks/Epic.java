@@ -75,4 +75,19 @@ public class Epic extends Task {
         return new Epic(this.getId(), this.getType(), this.getTitle(), this.getDescription(), this.getStatus(),
                 newSubtasks, this.getStartTime(), this.getDuration().toMinutes(), this.endTime);
     }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + this.getId() +
+                ", type=" + this.getType() +
+                ", title='" + this.getTitle() + '\'' +
+                ", description='" + this.getDescription() + '\'' +
+                ", status=" + this.getStatus() +
+                ", startTime=" + this.getStartTime() +
+                ", duration=" + this.getDuration().toMinutes() +
+                ", subtasksId=" + subtasksId +
+                ", endTime=" + endTime +
+                '}';
+    }
 }

@@ -81,6 +81,11 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     void tasksShouldNotOverlapInTime() {
         super.tasksShouldNotOverlapInTime();
     }
+    @Test
+    @Override
+    void epicMustBeDeletedAlongWithSubtasks(){
+        super.epicMustBeDeletedAlongWithSubtasks();
+    };
 
     @Test
     void shouldRestoreMaximumId() {

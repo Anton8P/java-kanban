@@ -195,4 +195,32 @@ public abstract class TaskManagerTest<T extends TaskManager> {
             manager.createTask(new Task("Test", "Description"));
         }, "Должно бросаться исключение при работе с неправильной директорией");
     }
+
+    void epicMustBeDeletedAlongWithSubtasks() {
+        LocalDateTime dateTime1 = LocalDateTime.of(2000, 12, 29, 18, 0);
+        LocalDateTime dateTime2 = LocalDateTime.of(2000, 12, 30, 18, 0);
+        LocalDateTime dateTime3 = LocalDateTime.of(2000, 12, 31, 18, 0);
+        Epic epic1 = new Epic("Эпик 1", "Desc Эпик 1");
+        Epic epic2 = new Epic("Эпик 2", "Desc Эпик 2");
+        int epic1Id = taskManager.createEpic(epic1);
+        int epic2Id = taskManager.createEpic(epic2);
+        Subtask subtask1 = new Subtask("Подзадача 1", "Desc 1", epic1Id).withTimes(dateTime1, 30);
+        Subtask subtask2 = new Subtask("Подзадача 2", "Desc 2", epic1Id).withTimes(dateTime2, 30);
+        Subtask subtask3 = new Subtask("Подзадача 3", "Desc 3", epic2Id).withTimes(dateTime3, 30);
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
+        taskManager.createSubtask(subtask3);
+        assertEquals(2, taskManager.getAllEpics().size(), "Должно быть 2 Эпика");
+        assertEquals(3, taskManager.getAllSubtasks().size(), "Должно быть 3 Подзадачи");
+        assertEquals(3, taskManager.getPrioritizedTasks().size(), "Должно быть 3 Задачи");
+        taskManager.deleteAllEpics();
+        assertTrue(taskManager.getAllEpics().isEmpty(), "Все Эпики должны быть удалены");
+        assertTrue(taskManager.getAllSubtasks().isEmpty(), "Все Подзадачи должны быть удалены");
+        boolean subtasksInPrioritized = taskManager.getPrioritizedTasks().stream()
+                .anyMatch(task -> task instanceof Subtask);
+        assertFalse(subtasksInPrioritized, "В prioritizedTasks не должно остаться Подзадач");
+        assertTrue(epic1.getSubtasksAllIds().isEmpty(), "Список подзадач Эпика 1 должен быть пустым");
+        assertTrue(epic2.getSubtasksAllIds().isEmpty(), "Список подзадач Эпика 2 должен быть пустым");
+
+    }
 }

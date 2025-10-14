@@ -21,6 +21,8 @@ public interface TaskManager {
 
     boolean updateSubtask(Subtask newSubtask);
 
+    List<Task> getPrioritizedTasks();
+
     ArrayList<Task> getAllTasks();
 
     ArrayList<Epic> getAllEpics();
