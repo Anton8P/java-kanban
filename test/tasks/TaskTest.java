@@ -6,6 +6,7 @@ import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,16 +26,20 @@ class TaskTest {
     void comparisonShouldReturnTrueWhenComparingId() {
         Task firstTask = new Task("Task original", "Description original").withId(15);
         Task secondTask = new Task("Duplicate Task", "Duplicate description").withId(15);
-        assertEquals(firstTask, secondTask, "Задачи с одинаковым id должны быть равны, независимо от других полей");
-        assertEquals(firstTask.hashCode(), secondTask.hashCode(), "Равные объекты должны иметь равные хэш-коды");
+        assertEquals(firstTask, secondTask,
+                "Задачи с одинаковым id должны быть равны, независимо от других полей");
+        assertEquals(firstTask.hashCode(), secondTask.hashCode(),
+                "Равные объекты должны иметь равные хэш-коды");
     }
 
     @Test
     void comparisonShouldReturnFalseWhenComparingId() {
         Task firstTask = new Task("Task original", "Description original").withId(15);
         Task secondTask = new Task("Task original", "Description original").withId(10);
-        assertNotEquals(firstTask, secondTask, "Задачи с разными id не должны быть равны");
-        assertNotEquals(firstTask.hashCode(), secondTask.hashCode(), "Задачи с разными id должны иметь разные хэш-коды");
+        assertNotEquals(firstTask, secondTask,
+                "Задачи с разными id не должны быть равны");
+        assertNotEquals(firstTask.hashCode(), secondTask.hashCode(),
+                "Задачи с разными id должны иметь разные хэш-коды");
     }
 
     @Test
@@ -43,17 +48,20 @@ class TaskTest {
         task = task.withStatus(NEW);
         int taskId = taskManager.createTask(task);
         assertTrue(taskId > 0, "Должен вернуть положительный ID");
-        Task savedTask = taskManager.getTask(taskId);
+        Task savedTask = taskManager.getTaskById(taskId);
         assertNotNull(savedTask, "Задача не найдена.");
-        assertEquals("Test addNewTask", savedTask.getTitle(), "Название не совпадает");
-        assertEquals("Test addNewTask description", savedTask.getDescription(), "Описание не совпадает");
+        assertEquals("Test addNewTask", savedTask.getTitle(),
+                "Название не совпадает");
+        assertEquals("Test addNewTask description", savedTask.getDescription(),
+                "Описание не совпадает");
         assertEquals(NEW, savedTask.getStatus(), "Статус не совпадает");
         assertEquals(taskId, savedTask.getId(), "ID не совпадает");
         List<Task> tasks = taskManager.getAllTasks();
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
         Task taskFromList = tasks.get(0);
-        assertEquals("Test addNewTask", taskFromList.getTitle(), "Название в списке не совпадает");
+        assertEquals("Test addNewTask", taskFromList.getTitle(),
+                "Название в списке не совпадает");
         assertEquals(taskId, taskFromList.getId(), "ID в списке не совпадает");
     }
 
@@ -63,16 +71,21 @@ class TaskTest {
         historyManager.add(task);
         final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "После добавления задачи, история не должна быть пустой.");
-        assertEquals(1, history.size(), "После добавления задачи, история не должна быть пустой.");
+        assertEquals(1, history.size(),
+                "После добавления задачи, история не должна быть пустой.");
     }
 
     @Test
     void taskFieldsShouldNotBeMutable() {
-        Task task = new Task(1, TaskType.TASK, "Original Title", "Original Description", TaskStatus.NEW);
+        LocalDateTime dateTime1 = LocalDateTime.of(2000, 12, 31, 23, 55);
+        LocalDateTime dateTime2 = LocalDateTime.of(2000, 12, 30, 12, 0);
+        Task task = new Task(1, TaskType.TASK, "Original Title", "Original Description",
+                TaskStatus.NEW, dateTime1, 5);
         Task withNewTitle = task.withTitle("New Title");
         Task withNewDesc = task.withDescription("New Description");
         Task withNewStatus = task.withStatus(TaskStatus.DONE);
         Task withNewId = task.withId(150);
+        Task withDateTime = task.withTimes(dateTime2, 10);
         assertEquals("Original Title", task.getTitle());
         assertEquals("Original Description", task.getDescription());
         assertEquals(TaskStatus.NEW, task.getStatus());
@@ -81,5 +94,6 @@ class TaskTest {
         assertNotSame(task, withNewDesc);
         assertNotSame(task, withNewStatus);
         assertNotSame(task, withNewId);
+        assertNotSame(task, withDateTime);
     }
 }

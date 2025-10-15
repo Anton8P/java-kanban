@@ -10,7 +10,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManager> {
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
     @Override
     protected InMemoryTaskManager createTaskManager() {
@@ -54,10 +54,38 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
     }
 
     @Test
-    @Override
-    void getAllSubtasksFromEpicTest() {
-        super.getAllSubtasksFromEpicTest();
+    void getAllSubtasksByEpicIdTest() {
+        super.getAllSubtasksByEpicIdTest();
     }
+
+    @Test
+    @Override
+    void subtaskMustBeRelatedToEpic() {
+        super.subtaskMustBeRelatedToEpic();
+    }
+
+    @Test
+    @Override
+    void epicMustContainLinksToItsSubtasks() {
+        super.epicMustContainLinksToItsSubtasks();
+    }
+
+    @Test
+    @Override
+    void whenDeletingAnEpicAllSubtasksMustBeDeleted() {
+        super.whenDeletingAnEpicAllSubtasksMustBeDeleted();
+    }
+
+    @Test
+    @Override
+    void tasksShouldNotOverlapInTime() {
+        super.tasksShouldNotOverlapInTime();
+    }
+    @Test
+    @Override
+    void epicMustBeDeletedAlongWithSubtasks(){
+        super.epicMustBeDeletedAlongWithSubtasks();
+    };
 
     @Test
     void shouldRestoreMaximumId() {
@@ -100,9 +128,11 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
     void notConflictIdInSubtask() {
         Epic epic = new Epic("Test WithGeneratedIdToEpic", "Epic description");
         int epicId = taskManager.createEpic(epic);
-        Subtask subtaskWithGeneratedId = new Subtask("Test WithGeneratedIdToSubtask", "Subtask description", epicId);
+        Subtask subtaskWithGeneratedId = new Subtask("Test WithGeneratedIdToSubtask",
+                "Subtask description", epicId);
         int generatedId = taskManager.createSubtask(subtaskWithGeneratedId);
-        Subtask subtaskWithGivenId = new Subtask("Test WithGivenIdToSubtask", "Subtask description", epicId).withId(2);
+        Subtask subtaskWithGivenId = new Subtask("Test WithGivenIdToSubtask", "Subtask description",
+                epicId).withId(2);
         int givenId = taskManager.createSubtask(subtaskWithGivenId);
         assertNotEquals(0, epicId, "id должен быть положительным");
         assertNotEquals(0, generatedId, "id должен быть положительным");
@@ -116,13 +146,14 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
         int id = taskManager.createTask(task);
         Task taskTemp = task.withId(id);
         task = taskTemp;
-        Task taskFromManager = taskManager.getTask(id);
+        Task taskFromManager = taskManager.getTaskById(id);
         assertEquals(task.getTitle(), taskFromManager.getTitle());
         assertNotNull(task);
         assertNotNull(taskFromManager);
         assertEquals(task.getId(), taskFromManager.getId(), "id не должен изменяться");
         assertEquals("Test Task", taskFromManager.getTitle(), "Title не должно изменяться");
-        assertEquals("Description", taskFromManager.getDescription(), "Description не должно изменяться");
+        assertEquals("Description", taskFromManager.getDescription(),
+                "Description не должно изменяться");
     }
 
     @Test

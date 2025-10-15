@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskManager> {
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     private File tempFile;
 
@@ -25,6 +25,30 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось создать файл");
         }
+    }
+
+    @Test
+    @Override
+    void shouldThrowAnExceptionIfFileIsNotFound() {
+        super.shouldThrowAnExceptionIfFileIsNotFound();
+    }
+
+    @Test
+    @Override
+    void doNotThrowAnExceptionIfFileExists() {
+        super.doNotThrowAnExceptionIfFileExists();
+    }
+
+    @Test
+    @Override
+    void shouldNotThrowAnExceptionForNonExistentFile() {
+        super.shouldNotThrowAnExceptionForNonExistentFile();
+    }
+
+    @Test
+    @Override
+    void anExceptionShouldBeThrownWhenWorkingWithAnInvalidDirectory() {
+        super.anExceptionShouldBeThrownWhenWorkingWithAnInvalidDirectory();
     }
 
     @Test
@@ -65,13 +89,13 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
 
     @Test
     @Override
-    void getAllSubtasksFromEpicTest() {
-        super.getAllSubtasksFromEpicTest();
+    void getAllSubtasksByEpicIdTest() {
+        super.getAllSubtasksByEpicIdTest();
     }
 
     @Test
     void shouldReturnAllSubtasksFromEpicAfterLoaded() throws IOException {
-        File testFile = File.createTempFile("test_temp",".txt");
+        File testFile = File.createTempFile("test_temp", ".txt");
         testFile.deleteOnExit();
         taskManager = new FileBackedTaskManager(testFile);
 
@@ -83,8 +107,8 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
         int subtaskId2 = taskManager.createSubtask(subtask2);
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(testFile);
-        assertFalse(loadedManager.getEpicById(epicId1).getSubtasksId().isEmpty());
-        assertEquals(2, loadedManager.getEpicById(epicId1).getSubtasksId().size());
+        assertFalse(loadedManager.getEpicById(epicId1).getSubtasksAllIds().isEmpty());
+        assertEquals(2, loadedManager.getEpicById(epicId1).getSubtasksAllIds().size());
     }
 
     @Test
@@ -171,7 +195,7 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
         assertEquals("Task 1 Description", loadTask.getDescription());
 
         Epic loadEpic = loadedManager.getAllEpics().get(0);
-        assertEquals(2, loadedManager.getAllSubtasksFromEpic(loadEpic.getId()).size());
+        assertEquals(2, loadedManager.getAllSubtasksByEpicId(loadEpic.getId()).size());
     }
 
     @Test
