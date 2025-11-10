@@ -54,4 +54,14 @@ public class Subtask extends Task {
                 newEpicId, this.getStartTime(), this.getDuration().toMinutes());
     }
 
+    public Subtask withStartTime(LocalDateTime startTime) {
+        return new Subtask(this.getId(), this.getType(), this.getTitle(), this.getDescription(), this.getStatus(),
+                this.epicId, startTime, this.getDuration().toMinutes());
+    }
+
+    public Subtask withDuration(long durationToMinutes) {
+        return new Subtask(this.getId(), this.getType(), this.getTitle(), this.getDescription(), this.getStatus(),
+                this.epicId, this.getStartTime(), durationToMinutes);
+    }
+
 }

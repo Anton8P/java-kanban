@@ -6,7 +6,10 @@ import tasks.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryHistoryManagerTest extends HistoryManagerTest<InMemoryHistoryManager> {
 
@@ -100,9 +103,9 @@ class InMemoryHistoryManagerTest extends HistoryManagerTest<InMemoryHistoryManag
         historyManager.add(subtask);
         List<Task> history = historyManager.getHistory();
         assertEquals(3, history.size(), "Должно быть 3 задачи в истории");
-        assertInstanceOf(Task.class, history.get(0), "Первая задача должна быть Task");
-        assertInstanceOf(Epic.class, history.get(1), "Вторая задача должна быть Epic");
-        assertInstanceOf(Subtask.class, history.get(2), "Третья задача должна быть Subtask");
+        assertTrue(history.get(0) instanceof Task, "Первая задача должна быть Task");
+        assertTrue(history.get(1) instanceof Epic, "Вторая задача должна быть Epic");
+        assertTrue(history.get(2) instanceof Subtask, "Третья задача должна быть Subtask");
         assertEquals(1, history.get(0).getId(), "У первой задачи должен быть ID = 1");
         assertEquals(2, history.get(1).getId(), "У первой задачи должен быть ID = 2");
         assertEquals(3, history.get(2).getId(), "У первой задачи должен быть ID = 3");

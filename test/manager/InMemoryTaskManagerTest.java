@@ -8,7 +8,9 @@ import tasks.TaskStatus;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
@@ -81,11 +83,14 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     void tasksShouldNotOverlapInTime() {
         super.tasksShouldNotOverlapInTime();
     }
+
     @Test
     @Override
-    void epicMustBeDeletedAlongWithSubtasks(){
+    void epicMustBeDeletedAlongWithSubtasks() {
         super.epicMustBeDeletedAlongWithSubtasks();
-    };
+    }
+
+    ;
 
     @Test
     void shouldRestoreMaximumId() {

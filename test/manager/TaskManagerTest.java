@@ -1,7 +1,11 @@
 package manager;
 
 import org.junit.jupiter.api.BeforeEach;
-import tasks.*;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+import tasks.TaskStatus;
+import tasks.TaskType;
 
 import java.io.File;
 import java.time.Duration;
@@ -77,7 +81,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task task = new Task("Task", "Description");
         int taskId = taskManager.createTask(task);
         assertTrue(taskManager.deleteTaskById(taskId));
-        assertNull(taskManager.getTaskById(taskId));
+        assertThrows(NotFoundException.class, () -> taskManager.getTaskById(taskId));
     }
 
     void getAllSubtasksByEpicIdTest() {
@@ -133,9 +137,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNotNull(taskManager.getSubtaskById(subtaskId1));
         assertNotNull(taskManager.getSubtaskById(subtaskId2));
         taskManager.deleteEpicById(epicId);
-        assertNull(taskManager.getEpicById(epicId), "Epic должен быть удален");
-        assertNull(taskManager.getSubtaskById(subtaskId1), "Подзадача 1 должна быть удалена");
-        assertNull(taskManager.getSubtaskById(subtaskId2), "Подзадача 2 должна быть удалена");
+        assertThrows(NotFoundException.class, () -> taskManager.getEpicById(epicId), "Epic должен быть удален");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubtaskById(subtaskId1), "Подзадача 1 должна быть удалена");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubtaskById(subtaskId2), "Подзадача 2 должна быть удалена");
     }
 
     void tasksShouldNotOverlapInTime() {
