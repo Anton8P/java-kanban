@@ -1,12 +1,18 @@
 package server;
 
+import manager.NotFoundException;
 import org.junit.jupiter.api.Test;
+import tasks.Task;
+import tasks.TaskStatus;
+import tasks.TaskType;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HttpTaskServerTasksTest extends HttpTaskServerBaseTest {
     @Test
@@ -22,19 +28,15 @@ public class HttpTaskServerTasksTest extends HttpTaskServerBaseTest {
 
     @Test
     void createTask() throws Exception {
-        String taskJson = """ 
-                {
-                    "title": "Test Task",
-                    "type": "TASK"
-                }
-                """;
-
+        TaskDto taskDto = new TaskDto();
+        taskDto.setTitle("Test Task");
+        taskDto.setType(TaskType.TASK);
+        String taskJson = gson.toJson(taskDto);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlBase + "/tasks"))
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
                 .header("Content-Type", "application/json")
                 .build();
-
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
         assertEquals(1, manager.getAllTasks().size());
@@ -42,100 +44,58 @@ public class HttpTaskServerTasksTest extends HttpTaskServerBaseTest {
 
     @Test
     void getTaskById() throws Exception {
-        String taskJson = """
-                {
-                    "title": "Test Task",
-                    "type": "TASK"
-                }
-                """;
-        HttpRequest createRequest = HttpRequest.newBuilder()
-                .uri(URI.create(urlBase + "/tasks"))
-                .POST(HttpRequest.BodyPublishers.ofString(taskJson))
-                .header("Content-Type", "application/json")
-                .build();
-        HttpResponse<String> createResponse = client.send(createRequest, HttpResponse.BodyHandlers.ofString());
-        String responseBody = createResponse.body();
-
-        TaskDto createdTask = gson.fromJson(responseBody, TaskDto.class);
-        int taskId = createdTask.getId();
-
-        HttpRequest getRequest = HttpRequest.newBuilder()
+        Task task = new Task("Test Task", "Description");
+        int taskId = manager.createTask(task);
+        HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlBase + "/tasks/" + taskId))
                 .GET()
                 .build();
-        HttpResponse<String> getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, getResponse.statusCode());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+        TaskDto responseTask = gson.fromJson(response.body(), TaskDto.class);
+        assertEquals("Test Task", responseTask.getTitle());
+        assertEquals(TaskType.TASK, responseTask.getType());
     }
 
     @Test
     void updateTask() throws Exception {
-        String createJson = """
-                {
-                    "title": "Original Task",
-                    "type": "TASK"
-                }
-                """;
-        HttpRequest createRequest = HttpRequest.newBuilder()
-                .uri(URI.create(urlBase + "/tasks"))
-                .POST(HttpRequest.BodyPublishers.ofString(createJson))
-                .header("Content-Type", "application/json")
-                .build();
-        HttpResponse<String> createResponse = client.send(createRequest, HttpResponse.BodyHandlers.ofString());
-        TaskDto createdTask = gson.fromJson(createResponse.body(), TaskDto.class);
-
-        String updateJson = """
-                {
-                    "id": %d,
-                    "title": "Updated Task",
-                    "type": "TASK",
-                    "status": "IN_PROGRESS"
-                }
-                """.formatted(createdTask.getId());
-
-        HttpRequest updateRequest = HttpRequest.newBuilder()
+        Task task = new Task("Original Task", "Description");
+        int taskId = manager.createTask(task);
+        TaskDto taskUpdateDto = new TaskDto();
+        taskUpdateDto.setId(taskId);
+        taskUpdateDto.setTitle("Updated Task");
+        taskUpdateDto.setType(TaskType.TASK);
+        taskUpdateDto.setStatus(TaskStatus.IN_PROGRESS);
+        String updateJson = gson.toJson(taskUpdateDto);
+        HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlBase + "/tasks"))
                 .POST(HttpRequest.BodyPublishers.ofString(updateJson))
                 .header("Content-Type", "application/json")
                 .build();
-        HttpResponse<String> updateResponse = client.send(updateRequest, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, updateResponse.statusCode());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode());
+        Task updatedTask = manager.getTaskById(taskId);
+        assertEquals("Updated Task", updatedTask.getTitle());
+        assertEquals(TaskStatus.IN_PROGRESS, updatedTask.getStatus());
     }
 
     @Test
     void deleteTask() throws Exception {
-        String taskJson = """
-                {
-                    "title": "Task to delete",
-                    "type": "TASK"
-                }
-                """;
-        HttpRequest createRequest = HttpRequest.newBuilder()
-                .uri(URI.create(urlBase + "/tasks"))
-                .POST(HttpRequest.BodyPublishers.ofString(taskJson))
-                .header("Content-Type", "application/json")
-                .build();
-        HttpResponse<String> createResponse = client.send(createRequest, HttpResponse.BodyHandlers.ofString());
-        TaskDto createdTask = gson.fromJson(createResponse.body(), TaskDto.class);
-
-        HttpRequest deleteRequest = HttpRequest.newBuilder()
-                .uri(URI.create(urlBase + "/tasks/" + createdTask.getId()))
+        Task task = new Task("Task to delete", "Description");
+        int taskId = manager.createTask(task);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlBase + "/tasks/" + taskId))
                 .DELETE()
                 .build();
-        HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, deleteResponse.statusCode());
-
-        HttpRequest getRequest = HttpRequest.newBuilder()
-                .uri(URI.create(urlBase + "/tasks/" + createdTask.getId()))
-                .GET()
-                .build();
-        HttpResponse<String> getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
-        assertEquals(404, getResponse.statusCode());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+        assertThrows(NotFoundException.class, () -> manager.getTaskById(taskId));
     }
 
     @Test
     void getTaskNotFound() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlBase + "/tasks/999"))
+                .uri(URI.create(urlBase + "/tasks/555"))
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -156,11 +116,9 @@ public class HttpTaskServerTasksTest extends HttpTaskServerBaseTest {
 
     @Test
     void createTaskWithoutTitle() throws Exception {
-        String taskJson = """
-                {
-                    "type": "TASK"
-                }
-                """;
+        TaskDto taskDto = new TaskDto();
+        taskDto.setType(TaskType.TASK);
+        String taskJson = gson.toJson(taskDto);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlBase + "/tasks"))
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
@@ -172,12 +130,10 @@ public class HttpTaskServerTasksTest extends HttpTaskServerBaseTest {
 
     @Test
     void createTaskWithWrongType() throws Exception {
-        String taskJson = """
-                {
-                    "title": "Test Task",
-                    "type": "EPIC"
-                }
-                """;
+        TaskDto taskDto = new TaskDto();
+        taskDto.setTitle("Test Task");
+        taskDto.setType(TaskType.EPIC);
+        String taskJson = gson.toJson(taskDto);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlBase + "/tasks"))
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
@@ -185,5 +141,24 @@ public class HttpTaskServerTasksTest extends HttpTaskServerBaseTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(400, response.statusCode());
+    }
+
+    @Test
+    void createTaskWithTimeOverlap() throws Exception {
+        Task task1 = new Task("Task 1", "Description", LocalDateTime.now(), 60);
+        manager.createTask(task1);
+        TaskDto taskDto = new TaskDto();
+        taskDto.setTitle("Task 2");
+        taskDto.setType(TaskType.TASK);
+        taskDto.setStartTime(LocalDateTime.now().plusMinutes(30));
+        taskDto.setDuration(60L);
+        String taskJson = gson.toJson(taskDto);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlBase + "/tasks"))
+                .POST(HttpRequest.BodyPublishers.ofString(taskJson))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(406, response.statusCode());
     }
 }

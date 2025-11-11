@@ -2,7 +2,6 @@ package server.handlers;
 
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.NotFoundException;
 import manager.TaskManager;
 import server.TaskDto;
@@ -17,12 +16,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
-
-    private final TaskManager taskManager;
+public class EpicsHandler extends BaseHttpHandler {
 
     public EpicsHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
     @Override
@@ -45,7 +42,6 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                     sendNotFound(exchange);
             }
 
-
         } catch (Exception e) {
             sendInternalError(exchange);
         }
@@ -66,6 +62,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                     if (isNumber(strIdWithSubtasks)) {
                         int idWithSubtasks = Integer.parseInt(strIdWithSubtasks);
                         try {
+                            taskManager.getEpicById(idWithSubtasks);
                             List<Subtask> subtasks = taskManager.getAllSubtasksByEpicId(idWithSubtasks);
                             List<TaskDto> subtasksDto = subtasks.stream()
                                     .map(TaskDtoConverter::toDto)
@@ -126,10 +123,14 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
                     Epic epic = (Epic) task;
 
-                    int id = taskManager.createEpic(epic);
-                    taskDto.setId(id);
-                    sendText(exchange, GSON.toJson(taskDto), 201);
-
+                    if (taskDto.getId() == null || taskDto.getId() == 0) {
+                        int id = taskManager.createEpic(epic);
+                        taskDto.setId(id);
+                        sendText(exchange, GSON.toJson(taskDto), 201);
+                    } else {
+                        taskManager.updateEpic(epic);
+                        sendText(exchange, GSON.toJson(taskDto), 201);
+                    }
                 } catch (JsonSyntaxException e) {
                     sendIncorrectRequest(exchange);
                 } catch (NotFoundException e) {
@@ -162,24 +163,3 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

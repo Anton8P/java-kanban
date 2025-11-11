@@ -2,7 +2,6 @@ package server.handlers;
 
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.NotFoundException;
 import manager.TaskManager;
 import manager.TimeOverlapException;
@@ -17,12 +16,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
-
-    private final TaskManager taskManager;
+public class SubtasksHandler extends BaseHttpHandler {
 
     public SubtasksHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
     @Override
@@ -154,27 +151,3 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

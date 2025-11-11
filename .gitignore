@@ -29,3 +29,6 @@ hs_err_pid*
 # Ignore test data files
 tasks.csv
 existent_file.txt
+
+# IDE
+.idea/

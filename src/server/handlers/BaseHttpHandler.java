@@ -3,6 +3,8 @@ package server.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import manager.TaskManager;
 import server.LocalDateTimeAdapter;
 
 import java.io.IOException;
@@ -10,7 +12,13 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class BaseHttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
+
+    protected final TaskManager taskManager;
+
+    public BaseHttpHandler(TaskManager taskManager) {
+        this.taskManager = taskManager;
+    }
 
     public boolean isNumber(String str) {
         try {

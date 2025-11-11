@@ -55,6 +55,6 @@ public class HttpTaskServer {
     public static void main(String[] args) throws IOException {
         HttpTaskServer taskServer = new HttpTaskServer();
         taskServer.start();
-        taskServer.stop();
+//        taskServer.stop();
     }
 }

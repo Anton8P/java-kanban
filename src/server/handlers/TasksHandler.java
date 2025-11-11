@@ -2,7 +2,6 @@ package server.handlers;
 
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.NotFoundException;
 import manager.TaskManager;
 import manager.TimeOverlapException;
@@ -16,13 +15,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-public class TasksHandler extends BaseHttpHandler implements HttpHandler {
-
-    private final TaskManager taskManager;
+public class TasksHandler extends BaseHttpHandler {
 
     public TasksHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
     @Override
@@ -49,7 +45,6 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
             sendInternalError(exchange);
         }
     }
-
 
     private void handleGet(HttpExchange exchange, String path) throws IOException {
         try {
@@ -108,7 +103,6 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                         int id = taskManager.createTask(task);
                         taskDto.setId(id);
                         sendText(exchange, GSON.toJson(taskDto), 201);
-
                     } else {
                         taskManager.updateTask(task);
                         sendText(exchange, GSON.toJson(taskDto), 201);
@@ -147,5 +141,3 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 }
-
-

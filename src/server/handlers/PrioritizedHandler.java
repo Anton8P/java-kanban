@@ -1,7 +1,6 @@
 package server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import server.TaskDto;
 import server.TaskDtoConverter;
@@ -11,12 +10,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
-
-    private final TaskManager taskManager;
+public class PrioritizedHandler extends BaseHttpHandler {
 
     public PrioritizedHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
     @Override
