@@ -6,7 +6,12 @@ import tasks.Subtask;
 import tasks.TaskStatus;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int generatedId = 1;
@@ -202,32 +207,38 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
-        if (task != null) {
-            historyManager.add(task);
+        if (task == null) {
+            throw new NotFoundException("Задача с id = " + id + " не найдена");
         }
+        historyManager.add(task);
         return task;
     }
 
     @Override
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
-        if (epic != null) {
-            historyManager.add(epic);
+        if (epic == null) {
+            throw new NotFoundException("Эпик с id = " + id + " не найден");
         }
+        historyManager.add(epic);
         return epic;
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
-        if (subtask != null) {
-            historyManager.add(subtask);
+        if (subtask == null) {
+            throw new NotFoundException("Подзадача с id = " + id + " не найдена");
         }
+        historyManager.add(subtask);
         return subtask;
     }
 
     @Override
     public List<Subtask> getAllSubtasksByEpicId(int epicId) {
+        if (!(isIdAlreadyExists(epicId))) {
+            throw new NotFoundException("Эпик с id = " + epicId + " не найден");
+        }
         return subtasks.values().stream()
                 .filter(subtask -> subtask.getEpicId() == epicId)
                 .toList();

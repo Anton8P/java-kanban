@@ -2,6 +2,7 @@ package tasks;
 
 import manager.HistoryManager;
 import manager.Managers;
+import manager.NotFoundException;
 import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,8 @@ class SubtaskTest {
         Subtask wrongSubtaskWrong = new Subtask("Wrong Subtask", "Fail test", subtaskId);
         int subtaskIdWrong = taskManager.createSubtask(wrongSubtaskWrong);
         assertEquals(0, subtaskIdWrong, "Subtask не должна быть Epic");
-        assertNull(taskManager.getSubtaskById(subtaskIdWrong), "Subtask не должна создаваться");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubtaskById(subtaskIdWrong),
+                "Subtask не должна создаваться");
     }
 
     @Test

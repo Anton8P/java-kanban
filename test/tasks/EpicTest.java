@@ -2,6 +2,7 @@ package tasks;
 
 import manager.HistoryManager;
 import manager.Managers;
+import manager.NotFoundException;
 import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,8 @@ class EpicTest {
         Epic secondEpic = new Epic("Duplicate Epic", "Duplicate description").withId(15);
         assertEquals(firstEpic, secondEpic, "Эпики с одинаковым id должны быть равны, " +
                 "независимо от других полей");
-        assertEquals(firstEpic.hashCode(), secondEpic.hashCode(), "Равные объекты должны иметь равные хэш-коды");
+        assertEquals(firstEpic.hashCode(), secondEpic.hashCode(),
+                "Равные объекты должны иметь равные хэш-коды");
     }
 
     @Test
@@ -46,17 +48,20 @@ class EpicTest {
         Task firstTask = new Epic("Task original", "Description original").withId(15);
         Task secondTask = new Epic("Duplicate Task", "Duplicate description").withId(15);
         assertEquals(firstTask, secondTask, "Эпики с одинаковым id должны быть равны");
-        assertEquals(firstTask.hashCode(), secondTask.hashCode(), "Равные объекты должны иметь равные хэш-коды");
+        assertEquals(firstTask.hashCode(), secondTask.hashCode(),
+                "Равные объекты должны иметь равные хэш-коды");
     }
 
     @Test
     void epicCannotBeAddedInSubtask() {
         Epic epic = new Epic("Test Epic", "Description");
         taskManager.createEpic(epic);
-        Subtask wrongSubtask = new Subtask("Wrong Subtask", "Fail test", epic.getId()).withId(epic.getId());
+        Subtask wrongSubtask = new Subtask("Wrong Subtask", "Fail test",
+                epic.getId()).withId(epic.getId());
         int result = taskManager.createSubtask(wrongSubtask);
         assertEquals(0, result, "Epic не должен быть subtask");
-        assertNull(taskManager.getSubtaskById(epic.getId()), "Subtask не должна создаваться");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubtaskById(epic.getId()),
+                "Subtask не должна создаваться");
         assertEquals(0, epic.getSubtasksAllIds().size(), "У Epic не должно быть subtasks");
     }
 
@@ -80,7 +85,8 @@ class EpicTest {
         assertFalse(updatedSubtaskIds.contains(subtaskId1), "Эпик НЕ должен содержать ID удаленной подзадачи");
         assertTrue(updatedSubtaskIds.contains(subtaskId2), "Эпик должен содержать ID оставшейся подзадачи");
         assertTrue(subtaskId1 != 1, "ID подзадачи не должно быть равным своему прежнему ID");
-        assertNull(taskManager.getSubtaskById(subtaskId1), "Подзадача должна быть удалена из менеджера");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubtaskById(subtaskId1),
+                "Подзадача должна быть удалена из менеджера");
     }
 
     @Test
