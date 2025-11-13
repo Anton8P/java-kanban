@@ -62,7 +62,6 @@ public class EpicsHandler extends BaseHttpHandler {
                     if (isNumber(strIdWithSubtasks)) {
                         int idWithSubtasks = Integer.parseInt(strIdWithSubtasks);
                         try {
-                            taskManager.getEpicById(idWithSubtasks);
                             List<Subtask> subtasks = taskManager.getAllSubtasksByEpicId(idWithSubtasks);
                             List<TaskDto> subtasksDto = subtasks.stream()
                                     .map(TaskDtoConverter::toDto)
